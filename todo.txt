@@ -1,0 +1,5 @@
+
+# tar xvf ~/KEEPIT/learn/iban_etc/Euronext_Equities_sample.tar
+% py euronextimport.py ~/Euronext_Equities_2020-12-24.xlsx > /mnt/tmp/rep
+
+
