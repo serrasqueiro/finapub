@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*-
-# stockfolio.py  (c)2021  Henrique Moreira
+# stockfolio.py  (c)2021, 2022  Henrique Moreira
 
 """
 Portfolio of stocks, from xlsx.

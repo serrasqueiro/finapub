@@ -7,9 +7,9 @@
 import sys
 import openpyxl
 from waxpage.redit import char_map
-from sindexes.isin import ISIN
+from mintracker.sindexes.isin import ISIN
 
-# pylint: disable=missing-function-docstring, line-too-long, no-self-use
+# pylint: disable=missing-function-docstring, line-too-long, use-list-literal
 
 DEF_EN_EQ_FNAME = "Euronext_Equities.xlsx"
 LINEAR_DUMP = False	# use True if you want to generate EURONEXT_STOCKS linearly
@@ -41,7 +41,7 @@ MKT_MAP = {
     "EN.PB": "Euronext Paris, Brussels",
     "OSLO": "Oslo B.rs",
     "NLB": "Traded not listed Brussels",
-    }
+}
 
 # date: 24.12.2020
 # source https://live.euronext.com/pt/products/equities/list
@@ -135,7 +135,7 @@ def dump_by_index(imp, opts, out, debug=0):
             assert isinstance(isin_list, (list, tuple))
             shown_isin = isin_list if len(isin_list) < 3 else (isin_list[:4] + ["..."])
             print(f"market-isin[{mkt}] len#{len(isin_list)}:", shown_isin)
-    avar = dict()
+    avar = {}
     mkts = sorted(MKT_MAP.keys())
     shown = ""
     for mkt in mkts:
@@ -171,7 +171,7 @@ def dump_by_index(imp, opts, out, debug=0):
             shown = tup[:-1]
             out.write(f"    {shown},\n")
         out.write("    )\n\n")
-        abbrevs, dups = dict(), list()
+        abbrevs, dups = {}, []
         for tup in cont:
             fourplet = tup[:-1]
             coin, isin, symbol, name = fourplet
@@ -195,7 +195,7 @@ def dump_by_index(imp, opts, out, debug=0):
 def dump_import(imp, opts, out=None) -> dict:
     err = sys.stderr
     stocks = list()
-    isins, symbs = dict(), dict()
+    isins, symbs = {}, {}
     filtered = opts["filter"]
     pre = opts["pre"]
     if pre:
@@ -218,10 +218,11 @@ def dump_import(imp, opts, out=None) -> dict:
         if symb in symbs:
             err.write(f"Duplicate symbol '{symb}', ISIN {isin}: {symbs[symb]}\n")
         symbs[symb] = tup
-    res = {"list": stocks,
-           "markets": [],
-           "market-isin": dict(),
-           }
+    res = {
+        "list": stocks,
+        "markets": [],
+        "market-isin": {},
+    }
     for stock in stocks:
         market = stock[-1]
         symb = stock[1]

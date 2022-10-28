@@ -5,12 +5,11 @@
 ISIN and stock cache
 """
 
+from netstocked.common import known_str
+
 # pylint: disable=missing-function-docstring, line-too-long
 
 LOG_CACHE = 1
-
-from netstocked.common import known_str
-
 
 FAST_ISIN = {
     "NL0000009538": "PHILIPS",	# KON.PHILIPS N.V.
