@@ -18,7 +18,7 @@ DEBUG = 0
 DEFAULT_ENV_VAR_DIR = "PINT"
 DEFAULT_BASENAME = "Transactions_accoes.xlsx"
 
-VALID_IDS = ("m", "H",)
+VALID_IDS = ("m", "H", "p",)
 
 LOW_IDX = 5000
 
@@ -218,7 +218,7 @@ def process_brute_content(content:dict, idx:int=2):
     baselist = ["NADA"] * idx
     from_to = []
     for acronym in VALID_IDS:
-        assert acronym not in content["by-id"]
+        assert acronym not in content["by-id"], acronym
         content["by-id"][acronym] = []
     line = idx
     for brute in rowlist:
