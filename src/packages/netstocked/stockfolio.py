@@ -19,8 +19,10 @@ DEFAULT_ENV_VAR_DIR = "PINT"
 DEFAULT_BASENAME = "Transactions_accoes.xlsx"
 
 VALID_IDS = ("m", "H", "p",)
+WHO_ID = "p"
 
 LOW_IDX = 5000
+TAX_COIN = "EUR"
 
 
 def main():
@@ -36,10 +38,8 @@ def main():
 
 def run(out, err, args):
     """ Run script """
-    assert err
-    who = "m"
-    #who = "H"
-    #who = ""
+    who = WHO_ID
+    assert err, "stderr"
     if args:
         if len(args) > 1:
             return None
@@ -206,21 +206,28 @@ def parse_input(header:list, hdr:dict, payload:list):
     #	print('\n'.join(types))
     msg = check_all_columns(hdr_dict, starting_row_idx, rowlist)
     assert msg == "", f"check_all_columns(): {msg}"
-    process_brute_content(content, starting_row_idx)
+    dct = process_brute_content(content, starting_row_idx)
+    # Sanity check only:
+    for acronym in dct:
+        # Check listing By acronym 'H', 'm', 'p', ...etc.
+        for idx, elem in enumerate(dct[acronym], starting_row_idx):
+            #print(":::", acronym, idx, elem)
+            assert len(elem) == 10, f"Unexpected length ({len(elem)}: {elem}"
     return content
 
 
-def process_brute_content(content:dict, idx:int=2):
+def process_brute_content(content:dict, idx:int=2) -> dict:
     """ Makes formulas """
     debug = DEBUG
-    alist = []
+    alist, taxlist = [], []
+    from_to = []
     rowlist = content["tail"]
     baselist = ["NADA"] * idx
-    from_to = []
     for acronym in VALID_IDS:
         assert acronym not in content["by-id"], acronym
         content["by-id"][acronym] = []
     line = idx
+    tax_idx = {}
     for brute in rowlist:
         types = brute["@data_types"]
         quant, per, local = brute["Quantidade"][1], brute["Per"][1], brute["Valor_local"][1]
@@ -244,22 +251,30 @@ def process_brute_content(content:dict, idx:int=2):
             f"line={line}",
         ]
         alist = [elem] + alist
+        taxa = brute["Taxa"][1]
+        if taxa is None:
+            taxa = "-"
+            taxval = 0.0
+        else:
+            taxa = money_string(taxa)
+            taxval = float(taxa)
+        taxlist = [(taxa, taxval, TAX_COIN)] + taxlist
         baselist.append(elem)
         idx += 1
         line += 1
     row_id = 1000
-    for elem in alist:
+    for idx, elem in enumerate(alist):
         row_id += 1
         elem[0] = row_id
         acronym = elem[1]
         tup = tuple(elem)
         from_to.append(tup)
         elem[0] = len(content["by-id"][acronym]) + LOW_IDX + 1
-        elem[1] = "*"	# fixed star ('*')
+        elem[1] = taxlist[idx]
         content["by-id"][acronym].append(elem)
     # Transactions().content()["data"]["from-to"] lists transactions linearly for all accounts
     content["from-to"] = from_to
-    return baselist
+    return content["by-id"]
 
 
 def check_all_columns(hdr_dict:dict, idx:int, rowlist:list) -> str:
