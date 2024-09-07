@@ -57,7 +57,7 @@ def run(out, err, args):
 class Transactions():
     """ Transactions class """
     def __init__(self, fname:str="", sheet_name:str=""):
-        self._wbk = openpyxl.load_workbook(fname) if fname else None
+        self._wbk = openpyxl.load_workbook(fname, read_only=True, data_only=True) if fname else None
         self._sheet, self._content = None, {}
         sheet = sheet_name if sheet_name else "stock_transactions"
         self._msg, self._content = "", {}
@@ -216,9 +216,8 @@ def parse_input(header:list, hdr:dict, payload:list):
     return content
 
 
-def process_brute_content(content:dict, idx:int=2) -> dict:
+def process_brute_content(content:dict, idx:int=2, debug=0) -> dict:
     """ Makes formulas """
-    debug = DEBUG
     alist, taxlist = [], []
     from_to = []
     rowlist = content["tail"]
@@ -231,6 +230,7 @@ def process_brute_content(content:dict, idx:int=2) -> dict:
     for brute in rowlist:
         types = brute["@data_types"]
         quant, per, local = brute["Quantidade"][1], brute["Per"][1], brute["Valor_local"][1]
+        #print("Debug:", content, quant, per, local)
         astr = date_from_cell_tup(brute["Data"])
         adate = astr
         value = round(quant * per, 2)
